@@ -34,6 +34,12 @@ else
     </table>
 }
 
+<div>
+    <input @bind = "name" placeholder="Type Name" />
+    <input @bind = "message" placeholder="Type Message" />
+</div>
+
+
 <button class="btn btn-primary" @onclick="AddTodo">Add To Do</button>
 
 <button class="btn btn-primary" @onclick="InvokeJavaScript">Invoke JS</button>
@@ -43,14 +49,32 @@ else
     private int currentCount = 0;
     private string jsonData;
     private List<ToDoItem> todoList;
+    private string name;
+    private string message;
 
     private async void AddTodo()
     {
         currentCount++;
         HttpClient httpClient = new HttpClient();
+
+        ToDoItem todoItemPost = new ToDoItem
+            {
+                name = name,
+                message = message
+            };
+        string myContent = JsonSerializer.Serialize(todoItemPost);
+        byte[] buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
+        ByteArrayContent byteContent = new ByteArrayContent(buffer);
+        byteContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+        await httpClient.PostAsync("https://pcso-jmd-backend.azurewebsites.net/todoitems", byteContent);
+
         jsonData = await httpClient.GetStringAsync("https://pcso-jmd-backend.azurewebsites.net/todoitems");
 
         todoList = JsonSerializer.Deserialize<List<ToDoItem>>(jsonData);
+
+        name = null;
+        message = null;
 
         StateHasChanged();
 
