@@ -1,8 +1,38 @@
 ﻿@page "/todo"
 @inject HttpClient Http
 @inject IJSRuntime JSRuntime
+@using System.Text.Json
+@using System.Text.Json.Serialization
 
 <h1>Welcome ToDo Page - here will will consume the new API</h1>
+
+
+@if (todoList == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Message</th>
+                <th>Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var todo in todoList)
+            {
+                <tr>
+                    <td>@todo.name</td>
+                    <td>@todo.message</td>
+                    <td>@todo.created</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
 
 <button class="btn btn-primary" @onclick="AddTodo">Add To Do</button>
 
@@ -11,10 +41,19 @@
 @code {
 
     private int currentCount = 0;
+    private string jsonData;
+    private List<ToDoItem> todoList;
 
-    private void AddTodo()
+    private async void AddTodo()
     {
         currentCount++;
+        HttpClient httpClient = new HttpClient();
+        jsonData = await httpClient.GetStringAsync("https://pcso-jmd-backend.azurewebsites.net/todoitems");
+
+        todoList = JsonSerializer.Deserialize<List<ToDoItem>>(jsonData);
+
+        StateHasChanged();
+
     }
 
     private async Task InvokeJavaScript()
@@ -22,5 +61,16 @@
         //await JSRuntime.InvokeVoidAsync("DeleteCache");
         await JSRuntime.InvokeVoidAsync("alert","Hello Im an alert box too!");
     }
+
+    // Root myDeserializedClass = JsonConvert.DeserializeObject<List<Root>>(myJsonResponse);
+    public class ToDoItem
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+        public bool isComplete { get; set; }
+        public string message { get; set; }
+        public DateTime created { get; set; }
+    }
+
 
 }
