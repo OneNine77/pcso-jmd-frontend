@@ -60,7 +60,8 @@ else
     {
         HttpClient httpClient = new HttpClient();
         await httpClient.DeleteAsync("https://pcso-jmd-backend.azurewebsites.net/todoitems");
-
+        await GetListAsync();
+        StateHasChanged();
     }
 
     private async void AddTodo()
@@ -80,15 +81,20 @@ else
 
         await httpClient.PostAsync("https://pcso-jmd-backend.azurewebsites.net/todoitems", byteContent);
 
+        await GetListAsync();
+
+        StateHasChanged();
+
+    }
+    private async Task GetListAsync()
+    {
+        HttpClient httpClient = new HttpClient();
         jsonData = await httpClient.GetStringAsync("https://pcso-jmd-backend.azurewebsites.net/todoitems");
 
         todoList = JsonSerializer.Deserialize<List<ToDoItem>>(jsonData);
 
         name = null;
         message = null;
-
-        StateHasChanged();
-
     }
 
     private async Task InvokeJavaScript()
