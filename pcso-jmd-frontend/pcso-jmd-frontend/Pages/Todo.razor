@@ -46,6 +46,8 @@ else
 
 <button class="btn btn-primary" @onclick="InvokeJavaScript">Invoke JS</button>
 
+<button class="btn btn-primary" @onclick="DeleteAll">Delete All</button>
+
 @code {
 
     private int currentCount = 0;
@@ -53,6 +55,13 @@ else
     private List<ToDoItem> todoList;
     private string name;
     private string message;
+
+    private async void DeleteAll()
+    {
+        HttpClient httpClient = new HttpClient();
+        await httpClient.DeleteAsync("https://pcso-jmd-backend.azurewebsites.net/todoitems");
+
+    }
 
     private async void AddTodo()
     {
