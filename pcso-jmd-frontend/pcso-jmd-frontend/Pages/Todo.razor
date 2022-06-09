@@ -19,6 +19,7 @@ else
                 <th>Name</th>
                 <th>Message</th>
                 <th>Created</th>
+                <th>Is Complete</th>
             </tr>
         </thead>
         <tbody>
@@ -28,6 +29,7 @@ else
                     <td>@todo.name</td>
                     <td>@todo.message</td>
                     <td>@todo.created</td>
+                    <td>@todo.isComplete</td>
                 </tr>
             }
         </tbody>
@@ -37,6 +39,8 @@ else
 <div>
     <input @bind = "name" placeholder="Type Name" />
     <input @bind = "message" placeholder="Type Message" />
+    <input type="checkbox" @bind="iscomplete" name="iscomplete"/>
+    <label for="iscomplete">Is Complete</label>
 </div>
 <br />
 <br />
@@ -48,6 +52,8 @@ else
 
 <button class="btn btn-primary" @onclick="DeleteAll">Delete All</button>
 
+<MudButton Variant="Variant.Filled" Color="Color.Primary" @onclick="InvokeJavaScript">Invoke JavaScript</MudButton>
+
 @code {
 
     private int currentCount = 0;
@@ -55,6 +61,7 @@ else
     private List<ToDoItem> todoList;
     private string name;
     private string message;
+    private bool iscomplete;
 
     private async void DeleteAll()
     {
@@ -72,7 +79,8 @@ else
         ToDoItem todoItemPost = new ToDoItem
             {
                 name = name,
-                message = message
+                message = message,
+                isComplete = iscomplete
             };
         string myContent = JsonSerializer.Serialize(todoItemPost);
         byte[] buffer = System.Text.Encoding.UTF8.GetBytes(myContent);
@@ -95,6 +103,7 @@ else
 
         name = null;
         message = null;
+        iscomplete = false;
     }
 
     private async Task InvokeJavaScript()
@@ -108,7 +117,7 @@ else
     {
         public int id { get; set; }
         public string name { get; set; }
-        public bool isComplete { get; set; }
+        public bool isComplete { get; set; } = false;
         public string message { get; set; }
         public DateTime created { get; set; }
     }
